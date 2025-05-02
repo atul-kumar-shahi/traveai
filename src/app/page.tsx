@@ -1,103 +1,82 @@
-import Image from "next/image";
+"use client"
+import { useState } from 'react'
+import ChatPane from './components/ChatPane'
+import VisualPane from './components/VisualPane'
 
-export default function Home() {
+type MessageType = {
+  type: 'user' | 'assistant';
+  text: string;
+}
+
+export default function App() {
+  const [messages, setMessages] = useState<MessageType[]>([]);
+  const [inputValue, setInputValue] = useState('Hi! I\'m planning a trip to Japan. Can you help me?');
+  const [showActivities, setShowActivities] = useState(false);
+  
+  // Pre-defined assistant responses
+  const assistantResponses = [
+    "Hello! I'd be happy to help with your Japan trip. Which cities or areas are you planning to explore?",
+    "Excellent picks! Tokyo and Kyoto are both incredible cities with unique experiences. How many days do you plan to stay in each?",
+    "Here are some top activities and attractions to consider during your Japan adventure:\n\nTokyo:\n• Shibuya Crossing\n• Senso-ji Temple\n• TeamLab Planets\n\nKyoto:\n• Fushimi Inari Taisha\n• Arashiyama Bamboo Grove\n• Kiyomizu-dera Temple\n\nYou can view details for each activity in the panel on the right."
+  ];
+  
+  
+  const nextMessages = [
+    "I'm thinking of visiting Tokyo and Kyoto. What do you recommend?",
+    "2 days in each city. Suggest activities",
+    "Tell me more about Fushimi Inari Taisha"
+  ];
+
+  const handleSendMessage = () => {
+    if (!inputValue.trim()) return;
+    
+    // Add user message
+    const newMessages: MessageType[] = [...messages, { type: 'user', text: inputValue }];
+    setMessages(newMessages);
+    
+    // Determine which assistant response to show
+    const assistantIndex = Math.min(Math.floor(newMessages.length / 2), assistantResponses.length - 1);
+    
+    // Add assistant response after a short delay
+    setTimeout(() => {
+      setMessages(prev => [...prev, { 
+        type: 'assistant', 
+        text: assistantResponses[assistantIndex] 
+      }]);
+      
+      // Show activities panel if the user asked for activity suggestions
+      if (inputValue.toLowerCase().includes('suggest activities')) {
+        setShowActivities(true);
+      }
+      
+      // Set up next message
+      if (assistantIndex < nextMessages.length) {
+        setInputValue(nextMessages[assistantIndex]);
+      } else {
+        setInputValue('');
+      }
+    }, 1000);
+    
+    // Clear input field immediately after sending
+    setInputValue('');
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
+    <div className="h-screen flex flex-col md:flex-row">
+      <div className={`${showActivities ? "md:w-1/2" : "w-full"} border-b md:border-b-0 md:border-r`}>
+        <ChatPane 
+          messages={messages}
+          inputValue={inputValue}
+          onInputChange={setInputValue}
+          onSendMessage={handleSendMessage}
         />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      </div>
+      {showActivities && (
+        <div className="md:w-1/2 w-full h-full overflow-y-auto">
+          <VisualPane />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      )}
     </div>
   );
+  
 }
