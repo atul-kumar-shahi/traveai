@@ -103,8 +103,8 @@ export default function ActivityDetail({
     ),
     location: (
       <div className="py-4">
-        <div className="bg-gray-200 h-48 rounded-lg flex items-center justify-center">
-          <p className="text-gray-600">Map view of {location}</p>
+        <div className="bg-gray-200  rounded-lg flex items-center justify-center">
+         <Image alt="map image" src="/map.png" height={720} width={720} className='h-48 w-full' />
         </div>
         <div className="mt-4">
           <h3 className="font-medium text-gray-900">Address:</h3>
